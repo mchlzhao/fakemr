@@ -8,5 +8,4 @@ class MapReduce:
         for i in map(self.mapper, self.reader()):
             k, v = list(i)[0]
             s.setdefault(k, []).append(v)
-        ret = itertools.starmap(self.reducer, s.items())
-        return ret
+        return dict(map(lambda x: list(x)[0], itertools.starmap(self.reducer, s.items())))
