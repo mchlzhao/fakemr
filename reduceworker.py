@@ -8,8 +8,10 @@ class ReduceWorker:
         self.output = {}
     def receiveInput(self, data):
         self.intermediatePairs.append(data)
-    def run(self):
+    def run(self, outputQueue):
         self.intermediatePairs.sort(key=self.sortKey)
+        print(self.intermediatePairs)
+        print()
         for k, vs in itertools.groupby(self.intermediatePairs, key=lambda x: x[0]):
             self.output.update(self.reduceFunc(k, list(map(lambda x: x[1], vs))))
-        return self.output
+        outputQueue.put(self.output)

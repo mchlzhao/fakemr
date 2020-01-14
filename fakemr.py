@@ -1,5 +1,6 @@
 import itertools
 import mapworker
+import multiprocessing
 import reduceworker
 
 class MapReduce:
@@ -18,6 +19,14 @@ class MapReduce:
             mapWorkers[0].receiveInput(data)
         for worker in mapWorkers:
             worker.run(reduceWorkers)
+        reduceProcesses = []
+        outputQueue = multiprocessing.Queue()
         for worker in reduceWorkers:
-            self.output.update(worker.run())
+            curProcess = multiprocessing.Process(target=worker.run, args=[outputQueue])
+            curProcess.start()
+            reduceProcesses.append(curProcess)
+        for process in reduceProcesses:
+            process.join()
+        for _ in range(self.numReduceWorkers):
+            self.output.update(outputQueue.get())
         return self.output
