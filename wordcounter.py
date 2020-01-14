@@ -16,7 +16,11 @@ def partitioner(data):
     return ord(data[0][0]) % 3
 
 if __name__ == '__main__':
-    counter = fakemr.MapReduce(reader=reader, mapper=mapper, reducer=reducer, partitioner=partitioner)
+    counter = fakemr.MapReduce(
+        reader=reader,
+        mapFunc=mapper,
+        reduceFunc=reducer
+    )
     ret = counter.run()
     for k, v in ret.items():
         print('%s %d' % (k, v))
