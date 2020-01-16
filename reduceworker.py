@@ -1,17 +1,21 @@
 import itertools
+import multiprocessing
 
 class ReduceWorker:
     def __init__(self, reduceFunc, customKey=None):
         self.reduceFunc = reduceFunc
         self.sortKey = customKey
-        self.intermediatePairs = []
+        self.input = []
         self.output = {}
-    def receiveInput(self, data):
-        self.intermediatePairs.append(data)
+        self.numInputs = 0
+        
+    def receiveBatch(self, data):
+        self.input.extend(data)
+
     def run(self, outputQueue):
-        self.intermediatePairs.sort(key=self.sortKey)
-        print(self.intermediatePairs)
+        self.input.sort(key=self.sortKey)
+        print(self.input)
         print()
-        for k, vs in itertools.groupby(self.intermediatePairs, key=lambda x: x[0]):
+        for k, vs in itertools.groupby(self.input, key=lambda x: x[0]):
             self.output.update(self.reduceFunc(k, list(map(lambda x: x[1], vs))))
         outputQueue.put(self.output)

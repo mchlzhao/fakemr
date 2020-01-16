@@ -4,9 +4,13 @@ class MapWorker:
         self.partitioner = partitioner
         self.input = []
         self.output = []
-    def receiveInput(self, data):
-        self.input.append(data)
-    def run(self, reduceWorkers):
+
+    def receiveBatch(self, data):
+        self.input.extend(data)
+
+    def run(self, outputQueue, numReduceWorkers):
         self.output = map(lambda x: list(x)[0], map(self.mapFunc, self.input))
-        for i in self.output:
-            reduceWorkers[self.partitioner(i)].receiveInput(i)
+        reduceWorkerInput = [[] for _ in range(numReduceWorkers)]
+        for intermediatePair in self.output:
+            reduceWorkerInput[self.partitioner(intermediatePair)].append(intermediatePair)
+        outputQueue.put(reduceWorkerInput)
