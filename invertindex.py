@@ -2,16 +2,18 @@ import fakemr
 import time
 
 def reader():
-    with open('testcases/anthem.txt', 'r') as f:
-        return f.read().lower().split()
+    with open('testcases/index.txt', 'r') as f:
+        return f.read().strip().split('\n')
 
-def mapper(value, key=None):
+def mapper(value):
     time.sleep(0.1)
-    yield value, 1
+    value = value.split()
+    for i in value[1:]:
+        yield i, value[0]
 
 def reducer(key, values):
     time.sleep(0.1)
-    yield key, sum(values)
+    yield key, ','.join(values)
 
 def getPartitioner(numReducers):
     return lambda x: hash(str(x)) % numReducers
@@ -29,6 +31,6 @@ if __name__ == '__main__':
     counter.numReduceWorkers = numReducers
     ret = counter.run()
     for k, v in ret.items():
-        print('%s %d' % (k, v))
+        print('%s %s' % (k, v))
     print('Num map workers = %d' % (counter.numMapWorkers))
     print('Num reduce workers = %d' % (counter.numReduceWorkers))
