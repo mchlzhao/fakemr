@@ -3,7 +3,7 @@ import wordcounter
 
 class WordCountTest(unittest.TestCase):
     def test(self):
-        numMappers = 1
+        numMappers = 4
         numReducers = 3
         counter = wordcounter.fakemr.MapReduce(
             reader=wordcounter.reader,

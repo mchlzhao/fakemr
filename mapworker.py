@@ -8,6 +8,8 @@ class MapWorker:
         self.input.extend(data)
 
     def run(self, outputQueue, numReduceWorkers):
+        print(len(self.input), ':', self.input)
+        print()
         output = []
         for data in self.input:
             output.extend(self.mapFunc(data))

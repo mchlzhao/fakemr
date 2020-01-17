@@ -17,7 +17,7 @@ def getPartitioner(numReducers):
     return lambda x: hash(str(x)) % numReducers
 
 if __name__ == '__main__':
-    numMappers = 3
+    numMappers = 4
     numReducers = 3
     counter = fakemr.MapReduce(
         reader=reader,

@@ -2,6 +2,12 @@ import mapworker
 import multiprocessing
 import reduceworker
 
+def chunked(data, numChunks):
+    chunks = [[] for _ in range(numChunks)]
+    for i in range(len(data)):
+        chunks[i%numChunks].append(data[i])
+    return chunks
+
 class MapReduce:
     def __init__(self, reader, mapFunc, reduceFunc, partitioner=lambda x: 0):
         self.reader = reader
@@ -11,45 +17,57 @@ class MapReduce:
         self.numMapWorkers = 1
         self.numReduceWorkers = 1
         self.output = {}
-
-    def run(self):
-        mapWorkers = [mapworker.MapWorker(self.mapFunc, self.partitioner) for i in range(self.numMapWorkers)]
-        reduceWorkers = [reduceworker.ReduceWorker(self.reduceFunc) for i in range(self.numReduceWorkers)]
-
-        inputData = self.reader()
-        numPerWorker = len(inputData)//self.numMapWorkers
-        for i in range(0, len(inputData), numPerWorker):
-            mapWorkers[i//numPerWorker].receiveBatch(inputData[i:min(i+numPerWorker, len(inputData))])
-
+        self.mapWorkers = None
+        self.reduceWorkers = None
+    
+    def runMapWorkers(self):
+        print('Running map workers')
         mapProcesses = []
-        mapOutputQueue = multiprocessing.Queue()
-        print('Running map processes')
-        for worker in mapWorkers:
+        outputQueue = multiprocessing.Queue()
+        for worker in self.mapWorkers:
             curProcess = multiprocessing.Process(
                 target=worker.run,
-                args=[mapOutputQueue, self.numReduceWorkers]
+                args=[outputQueue, self.numReduceWorkers]
             )
             curProcess.start()
             mapProcesses.append(curProcess)
         for process in mapProcesses:
             process.join()
-        
+        outputBatches = []
         for _ in range(self.numMapWorkers):
-            curBatch = mapOutputQueue.get()
-            for i in range(self.numReduceWorkers):
-                reduceWorkers[i].receiveBatch(curBatch[i])
-        
+            outputBatches.append(outputQueue.get())
+        return outputBatches
+    
+    def runReduceWorkers(self):
+        print('Running reduce workers')
         reduceProcesses = []
-        reduceOutputQueue = multiprocessing.Queue()
-        print('Running reduce processes')
-        for worker in reduceWorkers:
-            curProcess = multiprocessing.Process(target=worker.run, args=[reduceOutputQueue])
+        outputQueue = multiprocessing.Queue()
+        for worker in self.reduceWorkers:
+            curProcess = multiprocessing.Process(target=worker.run, args=[outputQueue])
             curProcess.start()
             reduceProcesses.append(curProcess)
         for process in reduceProcesses:
             process.join()
-
+        outputBatches = []
         for _ in range(self.numReduceWorkers):
-            self.output.update(reduceOutputQueue.get())
+            outputBatches.append(outputQueue.get())
+        return outputBatches
+    
+    def run(self):
+        self.mapWorkers = [mapworker.MapWorker(self.mapFunc, self.partitioner) for i in range(self.numMapWorkers)]
+        self.reduceWorkers = [reduceworker.ReduceWorker(self.reduceFunc) for i in range(self.numReduceWorkers)]
+
+        inputBatches = chunked(self.reader(), self.numMapWorkers)
+        for i in range(self.numMapWorkers):
+            self.mapWorkers[i].receiveBatch(inputBatches[i])
+
+        mapOutputBatches = self.runMapWorkers()
+        for batch in mapOutputBatches:
+            for i in range(self.numReduceWorkers):
+                self.reduceWorkers[i].receiveBatch(batch[i])
+        
+        reduceOutputBatches = self.runReduceWorkers()
+        for batch in reduceOutputBatches:
+            self.output.update(batch)
 
         return self.output
