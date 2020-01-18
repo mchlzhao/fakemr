@@ -9,16 +9,10 @@ def chunked(data, numChunks):
     return chunks
 
 class MapReduce:
-    def __init__(self, reader, mapFunc, reduceFunc, partitioner=lambda x: 0):
+    def __init__(self, reader, mapFunc, reduceFunc, partitioner, numMapWorkers, numReduceWorkers):
         self.reader = reader
-        self.mapFunc = mapFunc
-        self.reduceFunc = reduceFunc
-        self.partitioner = partitioner
-        self.numMapWorkers = 1
-        self.numReduceWorkers = 1
-        self.output = {}
-        self.mapWorkers = None
-        self.reduceWorkers = None
+        self.mapWorkers = [mapworker.MapWorker(mapFunc, partitioner(numReduceWorkers)) for i in range(numMapWorkers)]
+        self.reduceWorkers = [reduceworker.ReduceWorker(reduceFunc) for i in range(numReduceWorkers)]
     
     def runMapWorkers(self):
         print('Running map workers')
@@ -27,14 +21,14 @@ class MapReduce:
         for worker in self.mapWorkers:
             curProcess = multiprocessing.Process(
                 target=worker.run,
-                args=[outputQueue, self.numReduceWorkers]
+                args=[outputQueue, len(self.reduceWorkers)]
             )
             curProcess.start()
             mapProcesses.append(curProcess)
         for process in mapProcesses:
             process.join()
         outputBatches = []
-        for _ in range(self.numMapWorkers):
+        for _ in range(len(self.mapWorkers)):
             outputBatches.append(outputQueue.get())
         return outputBatches
     
@@ -49,25 +43,23 @@ class MapReduce:
         for process in reduceProcesses:
             process.join()
         outputBatches = []
-        for _ in range(self.numReduceWorkers):
+        for _ in range(len(self.reduceWorkers)):
             outputBatches.append(outputQueue.get())
         return outputBatches
     
     def run(self):
-        self.mapWorkers = [mapworker.MapWorker(self.mapFunc, self.partitioner) for i in range(self.numMapWorkers)]
-        self.reduceWorkers = [reduceworker.ReduceWorker(self.reduceFunc) for i in range(self.numReduceWorkers)]
-
-        inputBatches = chunked(self.reader(), self.numMapWorkers)
-        for i in range(self.numMapWorkers):
+        inputBatches = chunked(self.reader(), len(self.mapWorkers))
+        for i in range(len(self.mapWorkers)):
             self.mapWorkers[i].receiveBatch(inputBatches[i])
 
         mapOutputBatches = self.runMapWorkers()
         for batch in mapOutputBatches:
-            for i in range(self.numReduceWorkers):
+            for i in range(len(self.reduceWorkers)):
                 self.reduceWorkers[i].receiveBatch(batch[i])
         
+        output = {}
         reduceOutputBatches = self.runReduceWorkers()
         for batch in reduceOutputBatches:
-            self.output.update(batch)
+            output.update(batch)
 
-        return self.output
+        return output

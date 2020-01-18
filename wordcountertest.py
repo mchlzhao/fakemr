@@ -9,10 +9,10 @@ class WordCountTest(unittest.TestCase):
             reader=wordcounter.reader,
             mapFunc=wordcounter.mapper,
             reduceFunc=wordcounter.reducer,
-            partitioner=wordcounter.getPartitioner(numReducers)
+            partitioner=wordcounter.getPartitioner,
+            numMapWorkers=numMappers,
+            numReduceWorkers=numReducers
         )
-        counter.numMapWorkers = numMappers
-        counter.numReduceWorkers = numReducers
         ret = counter.run()
         self.assertEqual(len(ret), 42)
         self.assertEqual(ret['let'], 3)

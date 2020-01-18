@@ -9,10 +9,10 @@ class InvertIndexTest(unittest.TestCase):
             reader=invertindex.reader,
             mapFunc=invertindex.mapper,
             reduceFunc=invertindex.reducer,
-            partitioner=invertindex.getPartitioner(numReducers)
+            partitioner=invertindex.getPartitioner,
+            numMapWorkers=numMappers,
+            numReduceWorkers=numReducers
         )
-        counter.numMapWorkers = numMappers
-        counter.numReduceWorkers = numReducers
         ret = counter.run()
         print(ret)
         self.assertEqual(len(ret), 20)

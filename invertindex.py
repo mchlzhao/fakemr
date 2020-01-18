@@ -25,10 +25,10 @@ if __name__ == '__main__':
         reader=reader,
         mapFunc=mapper,
         reduceFunc=reducer,
-        partitioner=getPartitioner(numReducers)
+        partitioner=getPartitioner,
+        numMapWorkers=numMappers,
+        numReduceWorkers=numReducers
     )
-    counter.numMapWorkers = numMappers
-    counter.numReduceWorkers = numReducers
     ret = counter.run()
     for k, v in ret.items():
         print('%s %s' % (k, v))
