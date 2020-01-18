@@ -30,5 +30,5 @@ if __name__ == '__main__':
     ret = counter.run()
     for k, v in ret.items():
         print('%s %d' % (k, v))
-    print('Num map workers = %d' % (counter.numMapWorkers))
-    print('Num reduce workers = %d' % (counter.numReduceWorkers))
+    print('Num map workers = %d' % numMappers)
+    print('Num reduce workers = %d' % numReducers)
