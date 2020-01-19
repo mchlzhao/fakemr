@@ -21,7 +21,7 @@ def getPartitioner(numReducers):
 if __name__ == '__main__':
     numMappers = 3
     numReducers = 3
-    counter = fakemr.MapReduce(
+    counter = pymr.MapReduce(
         reader=reader,
         mapFunc=mapper,
         reduceFunc=reducer,
