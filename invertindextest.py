@@ -5,7 +5,7 @@ class InvertIndexTest(unittest.TestCase):
     def test(self):
         numMappers = 3
         numReducers = 3
-        counter = invertindex.fakemr.MapReduce(
+        counter = invertindex.pymr.MapReduce(
             reader=invertindex.reader,
             mapFunc=invertindex.mapper,
             reduceFunc=invertindex.reducer,

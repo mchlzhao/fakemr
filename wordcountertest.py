@@ -5,7 +5,7 @@ class WordCountTest(unittest.TestCase):
     def test(self):
         numMappers = 4
         numReducers = 3
-        counter = wordcounter.fakemr.MapReduce(
+        counter = wordcounter.pymr.MapReduce(
             reader=wordcounter.reader,
             mapFunc=wordcounter.mapper,
             reduceFunc=wordcounter.reducer,

@@ -1,4 +1,4 @@
-import fakemr
+import pymr
 import time
 
 def reader():

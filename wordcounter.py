@@ -1,4 +1,4 @@
-import fakemr
+import pymr
 import time
 
 def reader():
@@ -19,7 +19,7 @@ def getPartitioner(numReducers):
 if __name__ == '__main__':
     numMappers = 4
     numReducers = 3
-    counter = fakemr.MapReduce(
+    counter = pymr.MapReduce(
         reader=reader,
         mapFunc=mapper,
         reduceFunc=reducer,
