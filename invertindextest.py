@@ -3,15 +3,15 @@ import invertindex
 
 class InvertIndexTest(unittest.TestCase):
     def test(self):
-        numMappers = 3
-        numReducers = 3
+        num_mappers = 3
+        num_reducers = 3
         counter = invertindex.pymr.MapReduce(
             reader=invertindex.reader,
-            mapFunc=invertindex.mapper,
-            reduceFunc=invertindex.reducer,
-            partitioner=invertindex.getPartitioner,
-            numMapWorkers=numMappers,
-            numReduceWorkers=numReducers
+            map_func=invertindex.mapper,
+            reduce_func=invertindex.reducer,
+            partitioner=invertindex.get_partitioner,
+            num_map_workers=num_mappers,
+            num_reduce_workers=num_reducers
         )
         ret = counter.run()
         print(ret)

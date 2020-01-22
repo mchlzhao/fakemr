@@ -3,15 +3,15 @@ import wordcounter
 
 class WordCountTest(unittest.TestCase):
     def test(self):
-        numMappers = 4
-        numReducers = 3
+        num_mappers = 4
+        num_reducers = 3
         counter = wordcounter.pymr.MapReduce(
             reader=wordcounter.reader,
-            mapFunc=wordcounter.mapper,
-            reduceFunc=wordcounter.reducer,
-            partitioner=wordcounter.getPartitioner,
-            numMapWorkers=numMappers,
-            numReduceWorkers=numReducers
+            map_func=wordcounter.mapper,
+            reduce_func=wordcounter.reducer,
+            partitioner=wordcounter.get_partitioner,
+            num_map_workers=num_mappers,
+            num_reduce_workers=num_reducers
         )
         ret = counter.run()
         self.assertEqual(len(ret), 42)

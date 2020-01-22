@@ -15,22 +15,22 @@ def reducer(key, values):
     time.sleep(0.1)
     yield key, ','.join(values)
 
-def getPartitioner(numReducers):
-    return lambda x: hash(str(x)) % numReducers
+def get_partitioner(num_reducers):
+    return lambda x: hash(str(x)) % num_reducers
 
 if __name__ == '__main__':
-    numMappers = 3
-    numReducers = 3
+    num_mappers = 3
+    num_reducers = 3
     counter = pymr.MapReduce(
         reader=reader,
-        mapFunc=mapper,
-        reduceFunc=reducer,
-        partitioner=getPartitioner,
-        numMapWorkers=numMappers,
-        numReduceWorkers=numReducers
+        map_func=mapper,
+        reduce_func=reducer,
+        partitioner=get_partitioner,
+        num_map_workers=num_mappers,
+        num_reduce_workers=num_reducers
     )
     ret = counter.run()
     for k, v in ret.items():
         print('%s %s' % (k, v))
-    print('Num map workers = %d' % numMappers)
-    print('Num reduce workers = %d' % numReducers)
+    print('Num map workers = %d' % num_mappers)
+    print('Num reduce workers = %d' % num_reducers)
