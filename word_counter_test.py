@@ -1,9 +1,9 @@
 import unittest
-import wordcounter
+import word_counter
 
 class WordCountTest(unittest.TestCase):
     def test(self):
-        solver = wordcounter.WordCounter(4, 3)
+        solver = word_counter.WordCounter(4, 3)
         solver.solve()
         solver.print_result()
         result = solver.get_result()

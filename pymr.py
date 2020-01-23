@@ -1,6 +1,6 @@
-import mapworker
+import map_worker
 import multiprocessing
-import reduceworker
+import reduce_worker
 
 def chunked(data, num_chunks):
     chunks = [[] for _ in range(num_chunks)]
@@ -28,8 +28,8 @@ def parallelize(workers, target_args=[]):
 class MasterWorker:
     def __init__(self, reader, map_func, reduce_func, partitioner, num_map_workers, num_reduce_workers):
         self.reader = reader
-        self.map_workers = [mapworker.MapWorker(map_func, partitioner) for i in range(num_map_workers)]
-        self.reduce_workers = [reduceworker.ReduceWorker(reduce_func) for i in range(num_reduce_workers)]
+        self.map_workers = [map_worker.MapWorker(map_func, partitioner) for i in range(num_map_workers)]
+        self.reduce_workers = [reduce_worker.ReduceWorker(reduce_func) for i in range(num_reduce_workers)]
     
     def run(self):
         input_batches = chunked(self.reader(), len(self.map_workers))
@@ -50,8 +50,8 @@ class MasterWorker:
 
         return output
 
-class MapReduce:
-    def __init__(self, num_mappers, num_reducers):
+class Solver:
+    def __init__(self, num_mappers=2, num_reducers=2):
         self.num_mappers = num_mappers
         self.num_reducers = num_reducers
         self.result = None

@@ -1,9 +1,9 @@
 import unittest
-import invertindex
+import index_inverter
 
 class InvertIndexTest(unittest.TestCase):
     def test(self):
-        solver = invertindex.IndexInverter(3, 3)
+        solver = index_inverter.IndexInverter(3, 3)
         solver.solve()
         solver.print_result()
         result = solver.get_result()

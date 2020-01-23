@@ -1,7 +1,7 @@
 import pymr
 import time
 
-class IndexInverter(pymr.MapReduce):
+class IndexInverter(pymr.Solver):
     def reader(self):
         with open('testcases/index.txt', 'r') as f:
             return f.read().strip().split('\n')
@@ -17,6 +17,6 @@ class IndexInverter(pymr.MapReduce):
         yield key, ','.join(values)
 
 if __name__ == '__main__':
-    solver = IndexInverter(3, 3)
+    solver = IndexInverter()
     solver.solve()
     solver.print_result()
