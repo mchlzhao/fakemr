@@ -1,34 +1,20 @@
 import pymr
 import time
 
-def reader():
-    with open('testcases/anthem.txt', 'r') as f:
-        return f.read().lower().split()
+class WordCounter(pymr.MapReduce):
+    def reader(self):
+        with open('testcases/anthem.txt', 'r') as f:
+            return f.read().lower().split()
 
-def mapper(value, key=None):
-    time.sleep(0.1)
-    yield value, 1
+    def mapper(self, value, key=None):
+        time.sleep(0.1)
+        yield value, 1
 
-def reducer(key, values):
-    time.sleep(0.1)
-    yield key, sum(values)
-
-def get_partitioner(num_reducers):
-    return lambda x: hash(str(x)) % num_reducers
+    def reducer(self, key, values):
+        time.sleep(0.1)
+        yield key, sum(values)
 
 if __name__ == '__main__':
-    num_mappers = 4
-    num_reducers = 3
-    counter = pymr.MapReduce(
-        reader=reader,
-        map_func=mapper,
-        reduce_func=reducer,
-        partitioner=get_partitioner,
-        num_map_workers=num_mappers,
-        num_reduce_workers=num_reducers
-    )
-    ret = counter.run()
-    for k, v in ret.items():
-        print('%s %d' % (k, v))
-    print('Num map workers = %d' % num_mappers)
-    print('Num reduce workers = %d' % num_reducers)
+    solver = WordCounter(4, 3)
+    solver.solve()
+    solver.print_result()

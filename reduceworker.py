@@ -1,4 +1,4 @@
-import itertools
+from itertools import groupby
 
 class ReduceWorker:
     def __init__(self, reduce_func):
@@ -10,9 +10,8 @@ class ReduceWorker:
 
     def run(self, output_queue):
         self.input.sort()
-        print(self.input)
-        print()
+        print(len(self.input), ':', self.input, '\n')
         output = {}
-        for k, vs in itertools.groupby(self.input, key=lambda x: x[0]):
+        for k, vs in groupby(self.input, key=lambda x: x[0]):
             output.update(self.reduce_func(k, list(map(lambda x: x[1], vs))))
         output_queue.put(output)
