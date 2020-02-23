@@ -6,6 +6,8 @@ There are currently two sample programs demonstrating how to use the PyMR framew
 * [Index inverter](https://github.com/mchlzhao/pymr/blob/master/index_inverter.py)
 * [Word counter](https://github.com/mchlzhao/pymr/blob/master/word_counter.py)
 
+The design of the system was inspired by Google's [MapReduce research paper](https://research.google/pubs/pub62/) (Dean & Ghemawat, 2004).
+
 License
 ==
 PyMR is distributed under the terms of the MIT license. See LICENSE for details.
